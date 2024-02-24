@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 
 const ProductForm = () => {
@@ -7,6 +8,7 @@ const ProductForm = () => {
     const [productType, setProductType] = useState('solid');
     const [unit, setUnit] = useState(['1kg', '10kg', '200gm', '500gm']);
     const [checkedItems, setCheckedItems] = useState({});
+    const [formErrors, setFormErrors] = useState({ productName: '', productType: '' });
 
     const handleProductTypeChange = (event) => {
         const selectedType = event.target.value;
@@ -30,6 +32,15 @@ const ProductForm = () => {
         event.preventDefault();
 
         const selectedSubProducts = Object.keys(checkedItems).filter(key => checkedItems[key]);
+        if (!productName || !productType || selectedSubProducts.length === 0) {
+            setFormErrors({
+                productName: productName ? '' : 'Product name is required.',
+                productType: productType ? '' : 'Product type is required.',
+                unit: selectedSubProducts.length !== 0 ? '' : 'At least one unit must be selected.'
+            });
+            return;
+        }
+
         const sub = selectedSubProducts.map(item => productName + item);
         setSubProducts(sub);
 
@@ -39,9 +50,9 @@ const ProductForm = () => {
             subProduct: sub
         };
         setProducts(prevProducts => [newProduct, ...prevProducts]);
-
         setProductName('');
         setCheckedItems({});
+        setFormErrors({ productName: '', productType: '' });
     };
 
     return (
@@ -55,8 +66,9 @@ const ProductForm = () => {
                     value={productName}
                     onChange={(e) => setProductName(e.target.value)}
                     required
-                    style={{ marginBottom: '10px', marginRight: '10px' }}
+                    style={{ marginBottom: '10px', marginRight: '10px', padding: '5px' }}
                 />
+                {formErrors.productName && <div style={{ color: 'red' }}>{formErrors.productName}</div>}
             </div>
             <div>
                 <label htmlFor="productType">Product Type:</label>
@@ -65,11 +77,13 @@ const ProductForm = () => {
                     value={productType}
                     onChange={handleProductTypeChange}
                     required
-                    style={{ marginBottom: '10px', marginRight: '10px' }}
+                    style={{ marginBottom: '10px', marginRight: '10px', padding: '5px' }}
                 >
+                    <option value="">Select product type</option>
                     <option value="solid">Solid</option>
                     <option value="liquid">Liquid</option>
                 </select>
+                {formErrors.productType && <div style={{ color: 'red' }}>{formErrors.productType}</div>}
             </div>
 
             {unit.map((item) => (
@@ -84,8 +98,9 @@ const ProductForm = () => {
                     <label htmlFor={item}>{item}</label>
                 </div>
             ))}
+            {formErrors.unit && <div style={{ color: 'red' }}>{formErrors.unit}</div>}
 
-            <button onClick={handleSubmit} style={{ marginTop: '10px', marginRight: '10px' }}>Add Product</button>
+            <button onClick={handleSubmit} style={{ marginTop: '10px', marginRight: '10px', padding: '5px', backgroundColor: 'blue', color: 'white', border: 'none' }}>Add Product</button>
 
             <div>
                 {products.length ? (
@@ -120,4 +135,4 @@ const ProductForm = () => {
     );
 };
 
-export default ProductForm
+export default ProductForm;
